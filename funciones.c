@@ -309,3 +309,160 @@ int main(void)
     return 0;
 }
 #endif
+
+
+//_________________Funciones para listas doblemente enlazadas___________________
+/*
+typedef struct DoubleNode {
+    int data;
+    struct DoubleNode* next;
+    struct DoubleNode* prev;
+} DoubleNode;
+
+DoubleNode* createDoubleNode(int data);
+void insFirst(DoubleNode** PrimerNodo, DoubleNode** UltimoNodo, int new_data);
+void delLast(DoubleNode** PrimerNodo, DoubleNode** UltimoNodo);
+void showFull(DoubleNode* PrimerNodo);
+void showReversed(DoubleNode* UltimoNodo);
+void freeList(DoubleNode* PrimerNodo);
+void insInArbitrary(int place, DoubleNode **PrimerNodo, DoubleNode **UltimoNodo, int new_data);
+*/
+/*
+void insInArbitrary(int place, DoubleNode **PrimerNodo, DoubleNode **UltimoNodo, int new_data)
+{
+    // position = 0 is the position of the FirstNode.
+    if (place < 1)
+    {
+        printf("Invalid position. Position should be greater than or equal to 1.\n");
+        return;
+    }
+    DoubleNode *newDoubleNode = createDoubleNode(new_data);
+    if (*PrimerNodo == NULL)
+    {
+        printf("You are trying to insert in an empty list. Please insFirst() first\n");
+        return;
+    }
+    DoubleNode *current = *PrimerNodo;
+    int currentPosition = 0;
+    for(int i = 1; current  != NULL; i++)
+    {
+        //me freno en el bloque anterior al nodo que quiero agregar. fijate que inicio el for en el primer nodo
+        //y creo el puntero auxiliar current que apunta al primer nodo, entonces si "place" es 1 y
+        //al "newDoubleNode" le asigno el valor del current->next
+        if (i == place)
+        {// primero hago vinculos del nuevo nodo.
+            if(current->next == NULL)
+            {
+                printf("You are trying to insert in a position greater than the size of the list. Please insLast() instead.\n");
+                return;
+            }
+            newDoubleNode->prev = current; // newDoubleNode->prev = current->next->prev;
+            newDoubleNode->next = current->next; // current->next = (*current).next
+            newDoubleNode->next->prev = newDoubleNode;// Le asigno el nuevoNodo como anterior al siguiente del nuevoNodo.
+            newDoubleNode->prev->next = newDoubleNode; // Le asigno el nuevoNodo como siguiente al anterior del nuevoNodo.
+            //printf("el nuevo valor de la posicion %d es: %d\n",place,newDoubleNode->data); //codigo para chequear q funque
+            return;
+                        
+        }
+        current = current->next;
+        currentPosition++; // es lo mismo que decir que currentPosition = i.
+    }
+
+    if (current == NULL)
+    {
+        printf("You are trying to insert in a position greater than the size of the list. Please insLast() instead.\n");
+        return;
+    }
+}
+
+DoubleNode *createDoubleNode(int data)
+{
+    DoubleNode *newDoubleNode = (DoubleNode *)malloc(sizeof(DoubleNode)); // es un *puntero* que apunta a un struct DoubleNode.
+    if (!newDoubleNode)
+    {
+        fprintf(stderr, "Memory allocation failed!\n");
+        exit(1);
+    }
+    newDoubleNode->data = data;
+    newDoubleNode->next = NULL;
+    newDoubleNode->prev = NULL;
+    return newDoubleNode; // estamos devolviendo la direccion de memoria del nuevo nodo creado.
+}
+
+void insFirst(DoubleNode **PrimerNodo, DoubleNode **UltimoNodo, int new_data)
+{
+    DoubleNode *newDoubleNode = createDoubleNode(new_data);
+    if (*PrimerNodo == NULL)
+    // Este lo que hace es que si el PrimerNodo es null entonces significa que no hay elementos en la lista,
+    // entonces el nuevo nodo se convierte tanto en el primer nodo como en el último nodo de la lista.
+    {
+        *PrimerNodo = newDoubleNode; //newDoubleNode es una direccion de memoria (ver createDoubleNode), 
+        //entonces lo que estamos haciendo es inicializar el puntero PrimerNodo para que apunte a esa direccion de memoria.
+        *UltimoNodo = newDoubleNode;
+        return;
+    }
+
+    DoubleNode *current = *PrimerNodo; // cada nodo nuevo es el "primer nodo", => el current es el primer nodo.
+    // como PrimerNodo es un puntero a un puntero (puntero doble), entonces *PrimerNodo desreferencia el puntero para obtener la direccion de memoria del primer nodo actual.
+    newDoubleNode->next = current;
+    newDoubleNode->prev = NULL;
+    current->prev = newDoubleNode; // al atributo "prev" del nodo actual le asignamos la direccion de memoria del nuevo nodo, porque el nuevo nodo va a ser el nuevo primer nodo.
+    *PrimerNodo = newDoubleNode; //una vez tenga todo unido, le saco la corona al puntero PrimerNodo y se la doy al nuevo PrimerNodo.
+}
+
+void delLast(DoubleNode **PrimerNodo, DoubleNode **UltimoNodo)
+{
+    if (*PrimerNodo == NULL)
+    {
+        printf("List is empty. No Node to delete.\n");
+        return;
+    }
+    DoubleNode *current = *UltimoNodo;
+
+    if (current->prev == NULL)
+    {
+        free(current);
+        *PrimerNodo = NULL;
+        *UltimoNodo = NULL;
+        return;
+    }
+
+    *UltimoNodo = current->prev;
+    (*UltimoNodo)->next = NULL;
+    free(current);
+}
+
+void showFull(DoubleNode *PrimerNodo)
+{
+    DoubleNode *current = PrimerNodo;
+    while (current != NULL)
+    {
+        printf("%d -> ", current->data);
+        current = current->next;
+    }
+    printf("NULL\n");
+}
+
+void showReversed(DoubleNode *UltimoNodo)
+{
+    DoubleNode *current = UltimoNodo;
+    while (current != NULL)
+    {
+        printf("%d -> ", current->data);
+        current = current->prev;
+    }
+    printf("NULL\n");
+}
+
+void freeList(DoubleNode *PrimerNodo)
+{
+    DoubleNode *current = PrimerNodo;
+    DoubleNode *nextDoubleNode;
+    while (current != NULL)
+    {
+        nextDoubleNode = current->next;
+        free(current);
+        current = nextDoubleNode;
+    }
+}
+*/
