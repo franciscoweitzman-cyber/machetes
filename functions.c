@@ -130,6 +130,7 @@ void createGraph(tnode_info_t* info, int size, GraphNode** root) //size es la ca
         }
         grafo[i]->num_children = k;
     }
+    printf("la cantidad de hijos que tiene es: %d\n",k);
 }
 
 
@@ -146,11 +147,9 @@ void minDistAtLevel(GraphNode* root, int level)
         countPaths(root->children[i], l, paths);
     }
     int peso [*paths];
-    for(int i = 0; i< *paths; i++)
-    {
-        pesoPaths(root->children[i], *peso, paths, l, level, &i);
-    }
-    
+    int flagPaths;
+    int i = 0;
+    pesoPaths(root, *peso, paths, &i, level, &flagPaths);
     // if(root == NULL)
     // {
     //     printf("ERROR no hay nodos al nivel que buscas \n");
@@ -158,31 +157,33 @@ void minDistAtLevel(GraphNode* root, int level)
     // }
 
 }
-
-
-// necesito terminar esta funcion.
-
-
-
 void pesoPaths(GraphNode* node, int peso [], int *paths,int *lvl,int level, int *n);
 void pesoPaths(GraphNode* node, int peso [], int *paths, int *lvl,int level, int *n)
 {
     // necesito crear una funcion que cargue el peso de cada camino en un array, y despues sacar el minimo del array.
     {
-        if(node->num_children==0 && *lvl == level)
-        {
-            peso[*n] = node->dist_a_padre;
-        }
         printf("hola\n");
-        int newLvl = *lvl - 1;
-        
-        for(int i = 0; i<node->num_children;i++)
+        int newLvl = *lvl + 1;
+        paths[*n]+=node->dist_a_padre;
+        if(lvl == level)
         {
-        pesoPaths(node->children[i], &newLvl, paths);
+            printf("Posicion: %d",n);
+            printf("Peso camino: %d\n",paths[*n]);
+
+            *n++;
+            return;
         }
+        else
+        {
+            for(int i = 0; i<node->num_children;i++)
+            {
+                pesoPaths(node->children[i], &newLvl, paths);
+            }
+
+        }
+
     }
 }
-
 void countPaths(GraphNode* node, int *lvl, int *paths);
 void countPaths(GraphNode* node, int *lvl, int *paths)
 {
@@ -202,9 +203,9 @@ void countPaths(GraphNode* node, int *lvl, int *paths)
 
         }
         
-    }else
+    }else// ver esto que onda
     {
         return;
     }
-}
+} 
  
